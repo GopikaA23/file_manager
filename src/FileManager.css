@@ -1,4 +1,15 @@
-.folder {
-  margin-left: 18px;
+.filemanager {
+  border: 2px solid black;
+  background-color: rgb(191, 194, 194);
+  width: fit-content;
+  padding: 3px;
+  text-align: left;
 }
 
+.filemanager.grey {
+  background-color: rgb(213, 209, 209);
+}
+
+.filemanager.white {
+  background-color: white;
+}

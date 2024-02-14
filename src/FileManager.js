@@ -1,21 +1,40 @@
 import React, { useState } from "react";
 import { LuFolder, LuFile } from "react-icons/lu";
 
-const CreateItem = ({ fileType, handleFileTypeChange, handleCreate }) => {
+const FileFolderCreator = ({ level }) => {
+  const [fileType, setFileType] = useState("file");
   const [fileName, setFileName] = useState("");
+  const [createdItems, setCreatedItems] = useState([]);
+
+  const handleKeyPress = (event) => {
+    if (event.key === "Enter") {
+      if (fileType === "file") {
+        const newFile = { type: "file", name: fileName };
+        setCreatedItems([...createdItems, newFile]);
+      } else if (fileType === "folder") {
+        const newFolder = { type: "folder", name: fileName, items: [] };
+        setCreatedItems([...createdItems, newFolder]);
+      }
+      setFileName("");
+    }
+  };
+
+  const handleFileTypeChange = (event) => {
+    setFileType(event.target.value);
+  };
 
   const handleInputChange = (event) => {
     setFileName(event.target.value);
   };
 
-  const handleCreateItem = () => {
-    handleCreate(fileName);
-    setFileName(""); // Clear the input field after creating an item
-  };
-
   return (
-    <div>
-      <input type="text" value={fileName} onChange={handleInputChange} />
+    <div className={`filemanager ${level % 2 === 0 ? "grey" : "white"}`}>
+      <input
+        type="text"
+        value={fileName}
+        onChange={handleInputChange}
+        onKeyPress={handleKeyPress}
+      />
       <label>
         <input
           type="radio"
@@ -34,61 +53,20 @@ const CreateItem = ({ fileType, handleFileTypeChange, handleCreate }) => {
         />
         Folder
       </label>
-      <button onClick={handleCreateItem}>Create</button>
-    </div>
-  );
-};
-
-const FileFolderCreator = () => {
-  const [fileType, setFileType] = useState("file");
-  const [createdItems, setCreatedItems] = useState([]);
-
-  const handleFileTypeChange = (event) => {
-    setFileType(event.target.value);
-  };
-
-  const handleCreate = (itemName) => {
-    if (fileType === "file") {
-      const newFile = { type: "file", name: itemName };
-      setCreatedItems([...createdItems, newFile]);
-    } else if (fileType === "folder") {
-      const newFolder = { type: "folder", name: itemName, items: [] };
-      setCreatedItems([...createdItems, newFolder]);
-    }
-  };
-
-  const displayItems = (items) => {
-    return items.map((item, index) => (
-      <div key={index}>
-        {item.type === "folder" ? (
-          <div>
-            <div>
+      {createdItems.map((item, index) => (
+        <div key={index}>
+          {item.type === "folder" ? (
+            <div className="filemanager">
               <LuFolder /> {item.name}
+              <FileFolderCreator level={level + 1} />
             </div>
-            {item.items.length > 0 && <div>{displayItems(item.items)}</div>}
-            <CreateItem
-              fileType={fileType}
-              handleFileTypeChange={handleFileTypeChange}
-              handleCreate={(itemName) => handleCreate(itemName)}
-            />
-          </div>
-        ) : (
-          <div>
-            <LuFile /> {item.name}
-          </div>
-        )}
-      </div>
-    ));
-  };
-
-  return (
-    <div>
-      <CreateItem
-        fileType={fileType}
-        handleFileTypeChange={handleFileTypeChange}
-        handleCreate={(itemName) => handleCreate(itemName)}
-      />
-      <div>{displayItems(createdItems)}</div>
+          ) : (
+            <div>
+              <LuFile /> {item.name}
+            </div>
+          )}
+        </div>
+      ))}
     </div>
   );
 };
